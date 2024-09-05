@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  registry:
+    image: registry:2
+    container_name: secure-registry
+    ports:
+      - "443:443"
+    volumes:
+      - /root/.acme.sh/k8s.gcrio.dns.army_ecc:/ssl  # 挂载证书目录到容器内
+      - ./config.yml:/etc/docker/registry/config.yml  # 挂载自定义配置文件
+    environment:
+      - REGISTRY_HTTP_TLS_CERTIFICATE=/ssl/fullchain.cer
+      - REGISTRY_HTTP_TLS_KEY=/ssl/k8s.gcrio.dns.army.key
+    restart: always
+

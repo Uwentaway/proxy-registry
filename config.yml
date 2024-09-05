@@ -1,0 +1,31 @@
+version: 0.1
+log:
+  level: debug
+  fields:
+    service: registry
+    environment: development
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry  # 用于临时文件存储的路径
+  delete:
+    enabled: true
+http:
+  addr: :443
+  headers:
+    X-Content-Type-Options: [nosniff]
+  tls:
+    certificate: /ssl/fullchain.cer  # 指定 TLS 证书路径
+    key: /ssl/k8s.gcrio.dns.army.key
+proxy:
+  remoteurl: https://registry.k8s.io  # 这是默认的 Docker Hub
+  # 添加多个远程仓库
+  remotes:
+    - url: https://k8s.gcr.io  # Google Artifact Registry
+    - url: https://gcr.io  # Google Container Registry
+    - url: https://registry-1.docker.io
+    - url: https://quay.io  # Quay
+    - url: https://us-central1-docker.pkg.dev  # Google Artifact Registry
+
+  disable: false
+  cache:
+    layerinfo: inmemory  # 不缓存镜像层信息
