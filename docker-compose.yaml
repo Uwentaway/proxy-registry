@@ -1,16 +1,52 @@
 version: '3.8'
 
+networks:
+  proxy-registry:
+    driver: bridge
+
 services:
-  registry:
-    image: registry:2
-    container_name: secure-registry
+  nginx:
+    image: nginx:latest
+    container_name: nginx-ingrss
+      #  network_mode: "host"
     ports:
-      - "443:443"
+      - "80:80"
+      - "443:443"  # 开放 443 端口
     volumes:
-      - /root/.acme.sh/k8s.gcrio.dns.army_ecc:/ssl  # 挂载证书目录到容器内
-      - ./config.yml:/etc/docker/registry/config.yml  # 挂载自定义配置文件
-    environment:
-      - REGISTRY_HTTP_TLS_CERTIFICATE=/ssl/fullchain.cer
-      - REGISTRY_HTTP_TLS_KEY=/ssl/k8s.gcrio.dns.army.key
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certs:/certs
     restart: always
+    networks:
+      - proxy-registry
+
+
+  k8s-registry:
+    image: registry:2
+    container_name: k8s-registry
+    ports:
+      - "5000:5000"
+    volumes:
+ #     - /root/.acme.sh/*.gcrio.dns.army_ecc:/ssl  # 挂载证书目录到容器内
+      - ./k8s-config.yml:/etc/docker/registry/config.yml  # 挂载自定义配置文件
+ #   environment:
+ #     - REGISTRY_HTTP_TLS_CERTIFICATE=/ssl/fullchain.cer
+ #     - REGISTRY_HTTP_TLS_KEY=/ssl/*.gcrio.dns.army.key
+    restart: always
+    networks:
+      - proxy-registry
+
+  docker-registry:
+    image: registry:2
+    container_name: docker-registry
+    ports:
+      - "5001:5001"
+    volumes:
+ #     - /root/.acme.sh/*.gcrio.dns.army_ecc:/ssl  # 挂载证书目录到容器内
+      - ./docker-config.yml:/etc/docker/registry/config.yml  # 挂载自定义配置文件
+ #   environment:
+ #     - REGISTRY_HTTP_TLS_CERTIFICATE=/ssl/fullchain.cer
+ #     - REGISTRY_HTTP_TLS_KEY=/ssl/*.gcrio.dns.army.key
+    restart: always
+    networks:
+      - proxy-registry
 

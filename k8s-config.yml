@@ -10,12 +10,12 @@ storage:
   delete:
     enabled: true
 http:
-  addr: :443
+  addr: :5000
   headers:
     X-Content-Type-Options: [nosniff]
-  tls:
-    certificate: /ssl/fullchain.cer  # 指定 TLS 证书路径
-    key: /ssl/k8s.gcrio.dns.army.key
+      # tls:
+      #   certificate: /ssl/fullchain.cer  # 指定 TLS 证书路径
+      #   key: /ssl/k8s.gcrio.dns.army.key
 proxy:
   remoteurl: https://registry.k8s.io  # 这是默认的 Docker Hub
   # 添加多个远程仓库
